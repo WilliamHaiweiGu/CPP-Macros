@@ -46,21 +46,21 @@ const std::unordered_map<char, char> special_key{
     {'+', VK_ADD}
 };
 
-Macro::Macro(const double screen_scale, const double delay_s): scale(screen_scale),
-                                                               delay(round_int(delay_s * 1000000000)),
-                                                               is_shift(false),
-                                                               input{} {
+Macro::Macro(const double delay_s): delay(round_int(delay_s * 1000000000)),
+                                    is_shift(false),
+                                    input{} {
+    SetProcessDPIAware();
 }
 
 void Macro::move_mouse_to(const double x, const double y) const {
-    SetCursorPos(round_int(x / scale), round_int(y / scale));
+    SetCursorPos(round_int(x), round_int(y));
     std::this_thread::sleep_for(delay);
 }
 
 std::pair<int, int> Macro::query_mouse_pos() const {
     POINT p;
     GetCursorPos(&p);
-    return {round_int(p.x * scale), round_int(p.y * scale)};
+    return {p.x, p.y};
 }
 
 void Macro::left_click(const double x, const double y) const {

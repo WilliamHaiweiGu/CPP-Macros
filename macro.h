@@ -7,15 +7,13 @@
 
 class Macro {
 public:
-    const double scale;
     const std::chrono::nanoseconds delay;
     bool is_shift;
 
     /**
-     * @param screen_scale Magnification scale in display settings
      * @param delay_s Small delay in seconds after each key/mouse action to avoid being skipped. Must be ≤ 2.147483647
      */
-    Macro(double screen_scale, double delay_s);
+    Macro(double delay_s);
 
     void move_mouse_to(double x, double y) const;
 
