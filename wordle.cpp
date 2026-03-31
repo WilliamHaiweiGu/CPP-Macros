@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <random>
 #include <unordered_map>
-#include <thread>
 #include "util.h"
 #include "macro.h"
 #include "screenshot.h"
@@ -180,7 +179,7 @@ int main() {
             << std::endl;
     system("pause");
     std::cout << "Macro starting in 3 seconds..." << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    sleep(3);
     while (true) {
         WordleSolver solver;
         for (int i = 0; i < N_ROW; i++) {
@@ -189,7 +188,7 @@ int main() {
             std::cout << guess_str << std::flush;
             macro.type_string(guess_str);
             macro.type_string("\n");
-            std::this_thread::sleep_for(std::chrono::seconds(2));
+            sleep(2);
             const std::string row_color = get_row_color(i);
             std::cout << ' ' << row_color << std::endl;
             if (row_color == "GGGGG") {
@@ -201,8 +200,8 @@ int main() {
             solver.process_feedback(guess, row_color);
         }
         std::cout << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(2250));
+        sleep(2.3);
         macro.left_click(play_again.first, play_again.second);
-        std::this_thread::sleep_for(std::chrono::milliseconds(600));
+        sleep(0.7);
     }
 }

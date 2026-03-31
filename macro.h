@@ -1,17 +1,16 @@
 #pragma once
 
-#include <chrono>
 #include <string>
 #include <utility>
 #include <windows.h>
 
 class Macro {
 public:
-    const std::chrono::nanoseconds delay;
+    const double delay_s;
     bool is_shift;
 
     /**
-     * @param delay_s Small delay in seconds after each key/mouse action to avoid being skipped. Must be ≤ 2.147483647
+     * @param delay_s Small delay in seconds after each key/mouse action to avoid being skipped.
      */
     Macro(double delay_s);
 

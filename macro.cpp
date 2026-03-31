@@ -1,6 +1,4 @@
 #include <windows.h>
-#include <thread>
-#include <chrono>
 #include <unordered_map>
 #include "util.h"
 #include "macro.h"
@@ -46,7 +44,7 @@ const std::unordered_map<char, char> special_key{
     {'+', VK_ADD}
 };
 
-Macro::Macro(const double delay_s): delay(round_int(delay_s * 1000000000)),
+Macro::Macro(const double delay_s): delay_s(delay_s),
                                     is_shift(false),
                                     input{} {
     SetProcessDPIAware();
@@ -54,7 +52,7 @@ Macro::Macro(const double delay_s): delay(round_int(delay_s * 1000000000)),
 
 void Macro::move_mouse_to(const double x, const double y) const {
     SetCursorPos(round_int(x), round_int(y));
-    std::this_thread::sleep_for(delay);
+    sleep(delay_s);
 }
 
 std::pair<int, int> Macro::query_mouse_pos() const {
@@ -80,7 +78,7 @@ void Macro::press_key(const char key) {
     input.ki.wVk = static_cast<unsigned char>(key);
     input.ki.dwFlags = 0;
     SendInput(1, &input, sizeof(INPUT));
-    std::this_thread::sleep_for(delay);
+    sleep(delay_s);
 }
 
 void Macro::release_key(const char key) {
@@ -88,7 +86,7 @@ void Macro::release_key(const char key) {
     input.ki.wVk = static_cast<unsigned char>(key);
     input.ki.dwFlags = KEYEVENTF_KEYUP;
     SendInput(1, &input, sizeof(INPUT));
-    std::this_thread::sleep_for(delay);
+    sleep(delay_s);
 }
 
 /* Typing */

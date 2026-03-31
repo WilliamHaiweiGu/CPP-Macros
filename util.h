@@ -77,3 +77,8 @@ std::ostream &operator<<(std::ostream &os, const std::unordered_map<K, V> &map) 
 }
 
 int round_int(double n);
+
+/**
+ * @param duration_s Must be ≤ 4.294967295
+ */
+void sleep(double duration_s);
