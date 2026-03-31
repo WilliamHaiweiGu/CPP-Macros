@@ -1,14 +1,13 @@
-#include <iostream>
-#include <fstream>
-#include <array>
-#include <vector>
 #include <algorithm>
+#include <array>
+#include <fstream>
+#include <iostream>
 #include <random>
 #include <unordered_map>
-#include "util.h"
+#include <vector>
 #include "macro.h"
 #include "screenshot.h"
-
+#include "util.h"
 
 constexpr int N_LETTER = 5;
 constexpr int N_ROW = 6;
@@ -186,8 +185,8 @@ int main() {
             const word_t guess = solver.make_guess();
             const std::string guess_str(guess.data(), N_LETTER);
             std::cout << guess_str << std::flush;
-            macro.type_string(guess_str);
-            macro.type_string("\n");
+            macro.type_ascii_string(guess_str);
+            macro.type_ascii_string("\n");
             sleep(2);
             const std::string row_color = get_row_color(i);
             std::cout << ' ' << row_color << std::endl;

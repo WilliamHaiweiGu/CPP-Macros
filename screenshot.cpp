@@ -1,10 +1,9 @@
-#include <windows.h>
-#include <iostream>
 #include <array>
-#include <vector>
+#include <iostream>
 #include <stdexcept>
+#include <vector>
+#include <windows.h>
 #include "screenshot.h"
-
 
 Screenshot::Screenshot() {
     SetProcessDPIAware();

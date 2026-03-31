@@ -22,19 +22,19 @@ public:
 
     void right_click(double x, double y) const;
 
-    void press_key(char key);
+    void press_key(unsigned char key);
 
-    void release_key(char key);
+    void release_key(unsigned char key);
 
-    void type_key(char key);
+    void type_key(unsigned char key);
 
-    void non_shift_type(char key);
+    void non_shift_type(unsigned char key);
 
-    void shift_type(char key);
+    void shift_type(unsigned char key);
 
-    void type_char(char c);
+    void type_ascii(unsigned char c);
 
-    void type_string(const std::string &s);
+    void type_ascii_string(const std::string &s);
 
 private:
     INPUT input;
