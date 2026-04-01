@@ -1,11 +1,10 @@
-#include <iostream>
-#include <fstream>
-#include <array>
-#include <vector>
 #include <algorithm>
+#include <array>
+#include <fstream>
+#include <iostream>
 #include <random>
 #include <unordered_map>
-#include "util.h"
+#include <vector>
 
 constexpr int N_LETTER = 5;
 
