@@ -56,13 +56,13 @@ public:
     static std::string match(const int ans_idx, const word_t &guess) {
         const word_t &target = ANSWERS[ans_idx];
         std::unordered_map<char, uint8_t> target_freqs;
-        std::string ans = "BBBBB";
+
+        std::string ans(N_LETTER, 'B');
         for (int i = 0; i < N_LETTER; i++) {
             const char target_c = target[i];
             if (guess[i] == target_c) {
                 ans[i] = 'G';
-            }
-            else {
+            } else {
                 target_freqs[target_c]++;
             }
         }
@@ -136,32 +136,37 @@ public:
             }
         }
         // Get total entropy for every allowed word
-        std::vector<double> entropy(N_ALLOWED);
-        for (int w = 0; w < N_WORDLE; w++) {
-            if (solved[w]) {
-                continue;
-            }
-            std::vector<int> &possible_answer_idx = possible_answer_idxs[w];
-            const int n_possible = static_cast<int>(possible_answer_idx.size());
-            for (int i = 0; i < N_ALLOWED; i++) {
+        double max_entropy = 0;
+        int argmax = 0;
+        for (int i = 0; i < N_ALLOWED; i++) {
+            const word_t word = ALLOWED[i];
+            double word_entropy_total = 0;
+            for (int w = 0; w < N_WORDLE; w++) {
+                if (solved[w]) {
+                    continue;
+                }
+                std::vector<int> &possible_answer_idx = possible_answer_idxs[w];
+                const double n_possible = static_cast<double>(possible_answer_idx.size());
                 std::unordered_map<std::string, int> color_row_freqs;
-                const word_t word = ALLOWED[i];
                 for (const int answer_idx: possible_answer_idx) {
                     color_row_freqs[WordleGame::match(answer_idx, word)]++;
                 }
-                double word_entropy = 0;
                 for (const auto &[colors, count]: color_row_freqs) {
-                    const double prob = static_cast<double>(count) / n_possible;
-                    word_entropy -= prob * log2(prob);
+                    const double prob = count / n_possible;
+                    word_entropy_total -= prob * log2(prob);
                 }
-                entropy[i] += word_entropy;
+                // word_entropy_total increase in this iter is word entropy in this wordle
+            }
+            if (word_entropy_total > max_entropy) {
+                max_entropy = word_entropy_total;
+                argmax = i;
             }
         }
-        const auto max_it = std::max_element(entropy.begin(), entropy.end());
-        const int argmax = static_cast<int>(std::distance(entropy.begin(), max_it));
         return ALLOWED[argmax];
     }
 };
+
+const std::string SOLVED_COLOR(N_LETTER, 'G');
 
 void shell() {
     NWordleSolver player;
@@ -182,10 +187,10 @@ void shell() {
         for (auto &color: colors) {
             std::string in;
             std::cin >> in;
-            if (color != "GGGGG") {
+            if (color != SOLVED_COLOR) {
                 color = in;
             }
-            stop = stop && color == "GGGGG";
+            stop = stop && color == SOLVED_COLOR;
         }
         if (stop) {
             break;
