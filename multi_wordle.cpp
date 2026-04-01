@@ -54,30 +54,28 @@ public:
     }
 
     static std::string match(const int ans_idx, const word_t &guess) {
-        const word_t &target = ANSWERS[ans_idx];
-        std::unordered_map<char, uint8_t> target_freqs;
-
-        std::string ans(N_LETTER, 'B');
+        const word_t &answer = ANSWERS[ans_idx];
+        uint8_t yellow_freq[26]{};
+        std::string res(N_LETTER, 'B');
         for (int i = 0; i < N_LETTER; i++) {
-            const char target_c = target[i];
-            if (guess[i] == target_c) {
-                ans[i] = 'G';
+            const char answer_i = answer[i];
+            if (guess[i] == answer_i) {
+                res[i] = 'G';
             } else {
-                target_freqs[target_c]++;
+                yellow_freq[answer_i - 'A']++;
             }
         }
         for (int i = 0; i < N_LETTER; i++) {
-            if (ans[i] == 'G') {
+            if (res[i] == 'G') {
                 continue;
             }
-            const char guess_c = guess[i];
-            auto c_target_freq = target_freqs.find(guess_c);
-            if (c_target_freq != target_freqs.end() && c_target_freq->second > 0) {
-                ans[i] = 'Y';
-                c_target_freq->second--;
+            uint8_t &yellow_remain_cnt = yellow_freq[guess[i] - 'A'];
+            if (yellow_remain_cnt > 0) {
+                res[i] = 'Y';
+                yellow_remain_cnt--;
             }
         }
-        return ans;
+        return res;
     }
 };
 
