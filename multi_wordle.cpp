@@ -52,6 +52,10 @@ public:
     WordleGame() : target_idx(ans_dist(gen)) {
     }
 
+    std::string test(const word_t &guess) {
+        return match(target_idx, guess);
+    }
+
     static std::string match(const int ans_idx, const word_t &guess) {
         const word_t &answer = ANSWERS[ans_idx];
         uint8_t yellow_freq[26]{};
@@ -78,7 +82,8 @@ public:
     }
 };
 
-constexpr int N_WORDLE = 4;
+constexpr int N_WORDLE = 256;
+const std::string SOLVED_COLOR(N_LETTER, 'G');
 
 class NWordleSolver {
 public:
@@ -97,12 +102,17 @@ public:
 
     void process_feedback(const word_t &guess, const std::string (&colors)[N_WORDLE]) {
         for (int w = 0; w < N_WORDLE; w++) {
+            std::string color = colors[w];
+            if (color == SOLVED_COLOR) {
+                solved[w] = true;
+                continue;
+            }
             std::vector<int> &possible_answer_idx = possible_answer_idxs[w];
             const int n_possible = static_cast<int>(possible_answer_idx.size());
             int n_match = 0;
             for (int i = 0; i < n_possible; i++) {
                 const int answer_idx = possible_answer_idx[i];
-                if (colors[w] == WordleGame::match(answer_idx, guess)) { // keep result
+                if (color == WordleGame::match(answer_idx, guess)) { // keep result
                     possible_answer_idx[n_match++] = answer_idx;
                 }
             }
@@ -137,7 +147,7 @@ public:
         int argmax = 0;
         for (int i = 0; i < N_ALLOWED; i++) {
             const word_t word = ALLOWED[i];
-            double word_entropy_total = 0;
+            double word_info_gain = 0;
             for (int w = 0; w < N_WORDLE; w++) {
                 if (solved[w]) {
                     continue;
@@ -150,20 +160,17 @@ public:
                 }
                 for (const auto &[colors, count]: color_row_freqs) {
                     const double prob = count / n_possible;
-                    word_entropy_total -= prob * log2(prob);
+                    word_info_gain -= prob * log2(prob);
                 }
-                // word_entropy_total increase in this iter is word entropy in this wordle
             }
-            if (word_entropy_total > max_entropy) {
-                max_entropy = word_entropy_total;
+            if (word_info_gain > max_entropy) {
+                max_entropy = word_info_gain;
                 argmax = i;
             }
         }
         return ALLOWED[argmax];
     }
 };
-
-const std::string SOLVED_COLOR(N_LETTER, 'G');
 
 void shell() {
     NWordleSolver player;
@@ -179,7 +186,7 @@ void shell() {
     while (true) {
         const word_t guess = player.make_guess();
         const std::string guess_str(guess.data(), N_LETTER);
-        std::cout << "Guess: " << guess_str << "\nColor: " << std::flush;
+        std::cout << "Guess: " << guess_str << ", Color: " << std::flush;
         bool stop = true;
         for (auto &color: colors) {
             std::string in;
@@ -196,6 +203,32 @@ void shell() {
     }
 }
 
+void auto_game() {
+    WordleGame game[N_WORDLE]{};
+    std::string colors[N_WORDLE];
+    NWordleSolver player;
+    for (int i = 1;; i++) {
+        const word_t guess = player.make_guess();
+        const std::string guess_str(guess.data(), N_LETTER);
+        std::cout << "Guess: " << guess_str << ", Color:" << std::flush;
+        bool stop = true;
+        for (int w = 0; w < N_WORDLE; w++) {
+            std::string &color = colors[w];
+            if (i <= 0 || color != SOLVED_COLOR) {
+                color = game[w].test(guess);
+            }
+            std::cout << ' ' << color;
+            stop = stop && color == SOLVED_COLOR;
+        }
+        std::cout << std::endl;
+        if (stop) {
+            std::cout << "Solved in " << i << " rounds." << std::endl;
+            return;
+        }
+        player.process_feedback(guess, colors);
+    }
+}
+
 int main() {
-    shell();
+    auto_game();
 }
