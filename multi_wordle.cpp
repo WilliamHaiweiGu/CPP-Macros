@@ -1,5 +1,7 @@
+/** Must compile with --std=c++20*/
 #include <algorithm>
 #include <array>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <random>
@@ -14,8 +16,7 @@ using word_t = std::array<char, N_LETTER>;
 
 const std::array<char, N_LETTER> from_str(const std::string &str) {
     if (str.size() < N_LETTER) {
-        std::cerr << "String too short (must >=5): " << str << std::endl;
-        exit(-1);
+        throw std::runtime_error(std::format("Input string too short (must >=5): {}", str));
     }
     word_t word;
     copy_n(str.begin(), N_LETTER, word.begin());
@@ -26,8 +27,7 @@ const std::vector<word_t> load_file(const std::string &file_name) {
     std::ifstream file(file_name);
     std::vector<word_t> words;
     if (!file.is_open()) {
-        std::cerr << "Error opening file " << file_name << std::endl;
-        exit(-1);
+        throw std::runtime_error(std::format("Failed to open file {} ", file_name));
     }
     std::string line;
     while (getline(file, line))
@@ -43,7 +43,6 @@ const int N_ANSWERS = static_cast<int>(ANSWERS.size());
 
 std::default_random_engine gen((std::random_device())());
 std::uniform_int_distribution<int> ans_dist(0, N_ANSWERS - 1);
-
 
 class WordleGame {
 public:
@@ -134,8 +133,7 @@ public:
             std::vector<int> &possible_answer_idx = possible_answer_idxs[w];
             const int n_possible = static_cast<int>(possible_answer_idx.size());
             if (n_possible <= 0) {
-                std::cerr << "Err: No more word possible for game " << w << std::endl;
-                exit(-1);
+                throw std::runtime_error(std::format("Err: No more word possible for game {}", w));
             }
             if (n_possible == 1) {
                 solved[w] = true;
@@ -153,11 +151,11 @@ public:
                     continue;
                 }
                 std::vector<int> &possible_answer_idx = possible_answer_idxs[w];
-                const double n_possible = static_cast<double>(possible_answer_idx.size());
                 std::unordered_map<std::string, int> color_row_freqs;
                 for (const int answer_idx: possible_answer_idx) {
                     color_row_freqs[WordleGame::match(answer_idx, word)]++;
                 }
+                const double n_possible = static_cast<double>(possible_answer_idx.size());
                 for (const auto &[colors, count]: color_row_freqs) {
                     const double prob = count / n_possible;
                     word_info_gain -= prob * log2(prob);
