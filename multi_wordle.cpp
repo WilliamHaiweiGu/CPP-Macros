@@ -102,7 +102,7 @@ public:
 
     void process_feedback(const word_t &guess, const std::string (&colors)[N_WORDLE]) {
         for (int w = 0; w < N_WORDLE; w++) {
-            std::string color = colors[w];
+            const std::string &color = colors[w];
             if (color == SOLVED_COLOR) {
                 solved[w] = true;
                 continue;
@@ -186,7 +186,7 @@ void shell() {
     while (true) {
         const word_t guess = player.make_guess();
         const std::string guess_str(guess.data(), N_LETTER);
-        std::cout << "Guess: " << guess_str << ", Color: " << std::flush;
+        std::cout << guess_str << " | ";
         bool stop = true;
         for (auto &color: colors) {
             std::string in;
@@ -210,7 +210,7 @@ void auto_game() {
     for (int i = 1;; i++) {
         const word_t guess = player.make_guess();
         const std::string guess_str(guess.data(), N_LETTER);
-        std::cout << "Guess: " << guess_str << ", Color:" << std::flush;
+        std::cout << guess_str << " |";
         bool stop = true;
         for (int w = 0; w < N_WORDLE; w++) {
             std::string &color = colors[w];
